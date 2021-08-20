@@ -5,7 +5,11 @@ import { StyledFirebaseAuth } from "react-firebaseui";
 import db from "./firebase.config";
 
 class App extends Component {
-  state = { isSignedIn: false };
+  state = {
+    isSignedIn: false,
+    reservationPresent: false,
+    hostel: null,
+  };
   uiConfig = {
     signInFlow: "popup",
     signInOptions: [
@@ -19,13 +23,32 @@ class App extends Component {
 
   componentDidMount = async () => {
     firebase.auth().onAuthStateChanged((user) => {
+      let reservations = {};
       this.setState({ isSignedIn: !!user });
-    });
-
-    const response = db.collection("hostelRooms");
-    const data = await response.where('userId','==','M3uAcrQPbeOeCoR8oK5IFG8K9ar2').get();
-    data.docs.forEach((item) => {
-      console.log(item.data());
+      if (!!user) {
+        let response = db.collection("hostelRooms");
+        response
+          .where("userId", "==", user.uid)
+          .get()
+          .then((data) => {
+            data.docs.forEach((item) => {
+              reservations = { ...item.data() };
+            });
+            if (reservations["userId"]) {
+              this.setState({ reservationPresent: true });
+              this.setState({ hostel: reservations.hostel });
+              this.setState({ roomNumber: reservations.roomNumber });
+            } else {
+              this.setState({ reservationPresent: false });
+              this.setState({ hostel: null });
+              this.setState({ roomNumber: null });
+            }
+          });
+      } else {
+        this.setState({ reservationPresent: false });
+        this.setState({ hostel: null });
+        this.setState({ roomNumber: null });
+      }
     });
   };
   render() {
@@ -35,7 +58,15 @@ class App extends Component {
           <span>
             <div>Signed In!</div>
             <button onClick={() => firebase.auth().signOut()}>Sign out!</button>
-            <h1>Welcome {firebase.auth().currentUser.displayName}</h1>
+            {this.state.reservationPresent ? (
+              <span>
+                <h1>Welcome {firebase.auth().currentUser.displayName}</h1>
+                <div>Hostel No. {this.state.hostel}</div>
+                <div>Room No. {this.state.roomNumber}</div>
+              </span>
+            ) : (
+              <h1>Welcome {firebase.auth().currentUser.displayName}</h1>
+            )}
           </span>
         ) : (
           <StyledFirebaseAuth
