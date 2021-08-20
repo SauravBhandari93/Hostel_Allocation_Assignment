@@ -1,3 +1,4 @@
+
 .App {
   margin-top: 20px;
   text-align: center;
@@ -36,4 +37,12 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.SignedIn{
+  margin-bottom: 20px;
+  size: 30px;
+}
+.buttion1{
+  margin-top: 30px;
 }

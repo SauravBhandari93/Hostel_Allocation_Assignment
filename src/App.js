@@ -3,6 +3,8 @@ import "./App.css";
 import firebase from "firebase";
 import { StyledFirebaseAuth } from "react-firebaseui";
 import db from "./firebase.config";
+import Header from "./components/Header"
+
 
 class App extends Component {
   state = {
@@ -51,13 +53,14 @@ class App extends Component {
       }
     });
   };
+
   render() {
     return (
       <div className="App">
         {this.state.isSignedIn ? (
           <span>
-            <div>Signed In!</div>
-            <button onClick={() => firebase.auth().signOut()}>Sign out!</button>
+            <div className="SignedIn">Signed In!</div>
+           
             {this.state.reservationPresent ? (
               <span>
                 <h1>Welcome {firebase.auth().currentUser.displayName}</h1>
@@ -65,7 +68,7 @@ class App extends Component {
                 <div>Room No. {this.state.roomNumber}</div>
               </span>
             ) : (
-              <h1>Welcome {firebase.auth().currentUser.displayName}</h1>
+              <h1> {firebase.auth().currentUser.displayName}</h1>
             )}
           </span>
         ) : (
@@ -74,6 +77,7 @@ class App extends Component {
             firebaseAuth={firebase.auth()}
           />
         )}
+         <button className="buttion1" onClick={() => firebase.auth().signOut()}>Sign out!</button>
       </div>
     );
   }
